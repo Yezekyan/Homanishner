@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Homanishner</string>
+    <string name="logout_txt">Log out</string>
+    <string name="login_txt">Continue with Google</string>
+</resources>

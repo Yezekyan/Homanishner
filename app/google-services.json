@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "203098769559",
+    "project_id": "homanishner",
+    "storage_bucket": "homanishner.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203098769559:android:b96308a2310ea35cc481d2",
+        "android_client_info": {
+          "package_name": "com.example.homanishner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "203098769559-ibcluk94qfsnl8fdig60c0ilv9f3bnh0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-K8FeOY3oaPcpb20RSUUCS1shsL0lVX4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "203098769559-8nd805luf8vvputss7fkn4ln6d8kv01t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
