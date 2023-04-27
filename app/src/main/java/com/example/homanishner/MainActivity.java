@@ -3,10 +3,7 @@ package com.example.homanishner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,9 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -30,18 +24,27 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-
 public class MainActivity extends AppCompatActivity {
+    String TAG = "HOMANISHNER";
     private static final int RC_SIGN_IN = 88;
     private FirebaseAuth auth;
     private GoogleSignInOptions gso;
+    private String userId;
+    private User cUser;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private GoogleSignInClient signInClient;
+    private CollectionReference usersCol;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FirebaseApp.initializeApp(this);
+        usersCol = db.collection("users");
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -56,8 +59,11 @@ public class MainActivity extends AppCompatActivity {
         if (auth.getCurrentUser() != null) {
             auth.signOut();
             signInClient.signOut();
+            userId = "";
+            cUser = null;
             ((Button) btn).setText(R.string.login_txt);
             ((ImageView) findViewById(R.id.profileAvatar)).setImageResource(R.drawable.baseline_person_off_24);
+            ((TextView) findViewById(R.id.score_view)).setText("Score: 0");
             ((TextView) findViewById(R.id.title_text_view)).setText("Anonymous");
             return;
         }
@@ -68,10 +74,10 @@ public class MainActivity extends AppCompatActivity {
         if (user == null){
             return;
         }
-        String name = user.getDisplayName();
         Uri photo = user.getPhotoUrl();
-        ((TextView)findViewById(R.id.title_text_view)).setText(name);
+        ((TextView)findViewById(R.id.title_text_view)).setText(cUser.getDisplay_name());
         ((TextView)findViewById(R.id.login_btn)).setText(R.string.logout_txt);
+        ((TextView)findViewById(R.id.score_view)).setText("Score: "+cUser.getScore());
         ImageView profile_icon = (ImageView) findViewById(R.id.profileAvatar);
         Picasso.get().load(photo).transform(new CircleTransform()).into(profile_icon);
     }
@@ -80,11 +86,27 @@ public class MainActivity extends AppCompatActivity {
         auth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d("HOMANISHNER","WORKED? "+task.isSuccessful());
                 if (task.isSuccessful()){
-                    Log.d("HOMANISHNER","signInCredential");
                     FirebaseUser user = auth.getCurrentUser();
-                    updateUI(user);
+                    if (user == null){
+                        return;
+                    }
+                    userId = user.getUid();
+                    DocumentReference userRef = usersCol.document(userId);
+                    userRef.get(Source.SERVER).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            DocumentSnapshot document = task.getResult();
+                            if (!document.exists()){
+                                cUser = new User(user.getDisplayName(),0);
+                                usersCol.document(userId).set(cUser);
+                                updateUI(user);
+                                return;
+                            }
+                            cUser = document.toObject(User.class);
+                            updateUI(user);
+                        }
+                    });
                 }
 
             }
