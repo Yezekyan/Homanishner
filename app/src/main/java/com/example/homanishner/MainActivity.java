@@ -34,6 +34,7 @@ import com.squareup.picasso.Picasso;
 public class MainActivity extends AppCompatActivity {
     String TAG = "HOMANISHNER";
     private static final int RC_SIGN_IN = 88;
+    private static final int SETTINGS_CODE = 1;
     private FirebaseAuth auth;
     private GoogleSignInOptions gso;
     private String userId;
@@ -52,6 +53,25 @@ public class MainActivity extends AppCompatActivity {
                 ).build();
         signInClient = GoogleSignIn.getClient(this,gso);
         setContentView(R.layout.activity_main);
+        ((ImageView) findViewById(R.id.settings_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsClicked(view);
+            }
+        });
+        if (auth.getCurrentUser() !=null){
+            FirebaseUser user = auth.getCurrentUser();
+            userId = user.getUid();
+            DocumentReference userRef = usersCol.document(userId);
+            userRef.get(Source.SERVER).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot document = task.getResult();
+                    cUser = document.toObject(User.class);
+                    updateUI(user);
+                }
+            });
+        }
     }
 
 
@@ -79,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.login_btn)).setText(R.string.logout_txt);
         ((TextView)findViewById(R.id.score_view)).setText("Score: "+cUser.getScore());
         ImageView profile_icon = (ImageView) findViewById(R.id.profileAvatar);
+        ((ImageView) findViewById(R.id.settings_btn)).setVisibility(View.VISIBLE);
         Picasso.get().load(photo).transform(new CircleTransform()).into(profile_icon);
     }
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct){
@@ -126,6 +147,19 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("HOMANISHNER","FAILED_SIGNIN "+e.getMessage());
             }
         }
+        if (requestCode == SETTINGS_CODE && resultCode == RESULT_OK){
+            ((TextView) findViewById(R.id.title_text_view)).setText(data.getStringExtra("display_name"));
+        }
+    }
+    public void settingsClicked(View view) {
+        Log.d(TAG, "settingsClicked: "+view);
+         if (view.getId() == R.id.settings_btn) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivityForResult(intent,SETTINGS_CODE);
+        }
+
     }
 
+    public void startGame(View view) {
+    }
 }

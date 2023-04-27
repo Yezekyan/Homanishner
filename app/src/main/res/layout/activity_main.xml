@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="252dp"
         android:text="Start"
+        android:onClick="startGame"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -42,6 +43,7 @@
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
+        android:clickable="false"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
@@ -75,9 +77,18 @@
             android:scaleType="centerCrop"
             android:layout_marginTop="3dp"
             android:background="@drawable/roundy_bg"
+            android:onClick="settingsClicked"
+            android:clickable="true"
             android:layout_width="60dp"
             android:layout_height="60dp"
             app:srcCompat="@drawable/baseline_person_off_24" />
+        <ImageView
+            android:id="@+id/settings_btn"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="330dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/baseline_settings_24" />
 
     </androidx.cardview.widget.CardView>
 
