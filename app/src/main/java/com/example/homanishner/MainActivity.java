@@ -148,7 +148,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (requestCode == SETTINGS_CODE && resultCode == RESULT_OK){
-            ((TextView) findViewById(R.id.title_text_view)).setText(data.getStringExtra("display_name"));
+            if (data == null){
+                return;
+            }
+            String displayName = data.getStringExtra("display_name");
+            ((TextView) findViewById(R.id.title_text_view)).setText(displayName);
         }
     }
     public void settingsClicked(View view) {
@@ -161,5 +165,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startGame(View view) {
+    }
+
+    public void leaderboardClicked(View view) {
+        Intent intent = new Intent(this, LeaderboardActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUI(auth.getCurrentUser());
     }
 }

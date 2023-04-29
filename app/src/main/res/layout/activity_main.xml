@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="184dp"
         android:text="Leaderboards"
+        android:onClick="leaderboardClicked"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -81,6 +82,7 @@
             android:clickable="true"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:contentDescription="Profile icon"
             app:srcCompat="@drawable/baseline_person_off_24" />
         <ImageView
             android:id="@+id/settings_btn"
