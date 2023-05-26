@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:onClick="option_clicked"
     tools:context=".GameActivity">
 
     <Button
@@ -66,7 +65,7 @@
         android:layout_marginStart="50dp"
         android:layout_marginTop="250dp"
         android:autoSizeTextType="uniform"
-        android:text="%s հոմանիշ բառն է՝"
+        android:text="%s բառի հոմանիշն է՝"
         android:textSize="16sp"
         android:textStyle="bold"
         app:autoSizeMaxTextSize="22sp"

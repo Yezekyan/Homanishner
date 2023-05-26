@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -27,9 +29,15 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Source;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     String TAG = "HOMANISHNER";
@@ -74,7 +82,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    private static <T> T getRandomElement(List<T> list) {
+        Random rand = new Random();
+        int index = rand.nextInt(list.size());
+        return list.get(index);
+    }
     public void signInStarted(View btn) {
         if (auth.getCurrentUser() != null) {
             auth.signOut();
@@ -165,6 +177,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startGame(View view) {
+        if (cUser == null){
+            Toast.makeText(this, "Please login before using this!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        db.collection("quizes").orderBy(FieldPath.documentId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                List<QuizModel> quizList = new ArrayList<>();
+                for (DocumentSnapshot data : task.getResult().getDocuments()) {
+                    QuizModel model = data.toObject(QuizModel.class);
+                    model.setDocumentId(data);
+                    quizList.add(model);
+                }
+                QuizModel randomQuiz = getRandomElement(quizList);
+                String randomQuizId = randomQuiz.getDocumentId();
+
+                Intent intent = new Intent(MainActivity.this, GameActivity.class);
+                intent.putExtra("quiz_id", randomQuizId);
+                startActivity(intent);
+            }
+        });
+
     }
 
     public void leaderboardClicked(View view) {
@@ -175,6 +209,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        updateUI(auth.getCurrentUser());
+        if (auth.getCurrentUser()!=null){
+            db.collection("users").document(auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    cUser = task.getResult().toObject(User.class);
+                    updateUI(auth.getCurrentUser());
+                }
+            });
+        }
     }
 }

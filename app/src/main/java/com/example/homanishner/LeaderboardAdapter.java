@@ -30,7 +30,7 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User user = userList.get(position);
         holder.usernameTextView.setText(user.getDisplay_name());
-        holder.scoreTextView.setText(String.valueOf(user.getScore()));
+        holder.scoreTextView.setText("Score: "+user.getScore());
     }
 
     @Override
