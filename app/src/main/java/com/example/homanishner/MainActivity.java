@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void settingsClicked(View view) {
         Log.d(TAG, "settingsClicked: "+view);
-         if (view.getId() == R.id.settings_btn) {
+        if (view.getId() == R.id.settings_btn) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivityForResult(intent,SETTINGS_CODE);
         }

@@ -67,9 +67,15 @@ public class GameActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 DocumentSnapshot response = task.getResult();
                 game = response.toObject(QuizModel.class);
+                List<String> chosenWords = new ArrayList<>();
                 questionView.setText(String.format(questionView.getText().toString(),game.getQuestionWord()));
                 for (int i = 0; i < btns.size()-1; i++) {
-                    btns.get(i).setText(getRandomElement(dictionary.words));
+                    String word = getRandomElement(dictionary.words);
+                    while (chosenWords.contains(word)){
+                        word = getRandomElement(dictionary.words);
+                    }
+                    chosenWords.add(word);
+                    btns.get(i).setText(word);
                 }
                 btns.get(3).setText(game.getCorrectAnswer());
                 findViewById(R.id.progressBar).setVisibility(View.GONE);
@@ -80,7 +86,6 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
     }
-
     public void option_clicked(View view) {
         if (game == null){ finish(); }
         Button btn = (Button) view;
