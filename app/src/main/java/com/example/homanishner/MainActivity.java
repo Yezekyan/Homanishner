@@ -31,7 +31,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Source;
 import com.squareup.picasso.Picasso;
 
@@ -181,22 +180,19 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Please login before using this!", Toast.LENGTH_SHORT).show();
             return;
         }
-        db.collection("quizes").orderBy(FieldPath.documentId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                List<QuizModel> quizList = new ArrayList<>();
-                for (DocumentSnapshot data : task.getResult().getDocuments()) {
-                    QuizModel model = data.toObject(QuizModel.class);
-                    model.setDocumentId(data);
-                    quizList.add(model);
-                }
-                QuizModel randomQuiz = getRandomElement(quizList);
-                String randomQuizId = randomQuiz.getDocumentId();
-
-                Intent intent = new Intent(MainActivity.this, GameActivity.class);
-                intent.putExtra("quiz_id", randomQuizId);
-                startActivity(intent);
+        db.collection("quizes").orderBy(FieldPath.documentId()).get().addOnCompleteListener(task -> {
+            List<QuizModel> quizList = new ArrayList<>();
+            for (DocumentSnapshot data : task.getResult().getDocuments()) {
+                QuizModel model = data.toObject(QuizModel.class);
+                model.setDocumentId(data);
+                quizList.add(model);
             }
+            QuizModel randomQuiz = getRandomElement(quizList);
+            String randomQuizId = randomQuiz.getDocumentId();
+
+            Intent intent = new Intent(MainActivity.this, GameActivity.class);
+            intent.putExtra("quiz_id", randomQuizId);
+            startActivity(intent);
         });
 
     }
