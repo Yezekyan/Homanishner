@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -68,7 +69,7 @@ public class GameActivity extends AppCompatActivity {
                 DocumentSnapshot response = task.getResult();
                 game = response.toObject(QuizModel.class);
                 List<String> chosenWords = new ArrayList<>();
-                questionView.setText(String.format(questionView.getText().toString(),game.getQuestionWord()));
+                questionView.setText(Html.fromHtml(String.format(questionView.getText().toString(),"<u>"+game.getQuestionWord()+"</u>")));
                 for (int i = 0; i < btns.size()-1; i++) {
                     String word = getRandomElement(dictionary.words);
                     while (chosenWords.contains(word)){
