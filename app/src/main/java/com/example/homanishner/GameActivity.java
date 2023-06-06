@@ -89,13 +89,14 @@ public class GameActivity extends AppCompatActivity {
     public void option_clicked(View view) {
         if (game == null){ finish(); }
         Button btn = (Button) view;
+        if (!((Button) view).getText().toString().equalsIgnoreCase(game.getCorrectAnswer())){
+            view.setBackgroundColor(Color.parseColor("#ff0000"));
+        }
         for (Button btn_:btns) {
             btn_.setClickable(false);
             if (btn_.getText().toString().equalsIgnoreCase(game.getCorrectAnswer())){
                 btn_.setBackgroundColor(Color.parseColor("#00ff00"));
-                continue;
             }
-            btn_.setBackgroundColor(Color.parseColor("#ff0000"));
         }
         if (btn.getText().toString().equalsIgnoreCase(game.getCorrectAnswer())){
             db.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
