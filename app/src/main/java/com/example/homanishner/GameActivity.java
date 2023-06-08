@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ public class GameActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private QuizModel game;
     private List<Button> btns;
+    private ArrayList<String> chosenWords_;
     private Integer score;
     private Integer index;
     private String userId;
@@ -58,7 +60,12 @@ public class GameActivity extends AppCompatActivity {
         Intent payloadIntent = getIntent();
         index = payloadIntent.getIntExtra("index",0);
         score = payloadIntent.getIntExtra("score",0);
+        chosenWords_ = payloadIntent.getStringArrayListExtra("words");
         String id = payloadIntent.getStringExtra("quiz_id");
+        if (chosenWords_ == null){
+            chosenWords_ = new ArrayList<>();
+        }
+        chosenWords_.add(id);
         if (index>=5){
             Toast.makeText(this, "Total score gained: "+ score, Toast.LENGTH_SHORT).show();
             finish();
@@ -67,6 +74,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 DocumentSnapshot response = task.getResult();
+
                 game = response.toObject(QuizModel.class);
                 List<String> chosenWords = new ArrayList<>();
                 questionView.setText(Html.fromHtml(String.format(questionView.getText().toString(),"<u>"+game.getQuestionWord()+"</u>")));
@@ -74,6 +82,9 @@ public class GameActivity extends AppCompatActivity {
                     String word = getRandomElement(dictionary.words);
                     while (chosenWords.contains(word)){
                         word = getRandomElement(dictionary.words);
+                    }
+                    if (chosenWords_ == null){
+                        chosenWords_ = new ArrayList<>();
                     }
                     chosenWords.add(word);
                     btns.get(i).setText(word);
@@ -123,11 +134,16 @@ public class GameActivity extends AppCompatActivity {
                             quizList.add(model);
                         }
                         QuizModel randomQuiz = getRandomElement(quizList);
+                        Log.d("chosenwords", "onComplete: "+chosenWords_);
+                        while (chosenWords_.contains(randomQuiz.getDocumentId())){
+                            randomQuiz = getRandomElement(quizList);
+                        }
                         String randomQuizId = randomQuiz.getDocumentId();
                         Intent intent = new Intent(GameActivity.this, GameActivity.class);
                         intent.putExtra("quiz_id", randomQuizId);
                         intent.putExtra("score",score);
                         intent.putExtra("index",index+1);
+                        intent.putStringArrayListExtra("words",chosenWords_);
                         finish();
                         startActivity(intent);
                     }
